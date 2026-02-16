@@ -25,14 +25,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build with Env Injection
-        # This line manually exports .env.local variables into the build environment
-        run: |
-          if [ -f .env.local ]; then
-            export $(grep -v '^#' .env.local | xargs)
-          fi
-          npm run build
+      - name: Build with Env
+        run: npm run build
         env:
+          # We manually map the variables here to ensure 
+          # Next.js 16 picks them up during the static export
+          NEXT_PUBLIC_BUSINESS_NAME: ${{ vars.NEXT_PUBLIC_BUSINESS_NAME }}
+          NEXT_PUBLIC_BUSINESS_CITY: ${{ vars.NEXT_PUBLIC_BUSINESS_CITY }}
+          NEXT_PUBLIC_THEME_COLOR: ${{ vars.NEXT_PUBLIC_THEME_COLOR }}
+          NEXT_PUBLIC_BASE_PATH: "/${{ github.event.repository.name }}"
           NODE_ENV: production
 
       - name: Upload artifact
