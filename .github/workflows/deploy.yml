@@ -1,4 +1,4 @@
-name: Deploy Nexus Master
+name: Deploy Nexus Portal
 on:
   push:
     branches: ["main"]
@@ -25,10 +25,15 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build with Next.js
-        run: npm run build
+      - name: Build with Env Injection
+        # This line manually exports .env.local variables into the build environment
+        run: |
+          if [ -f .env.local ]; then
+            export $(grep -v '^#' .env.local | xargs)
+          fi
+          npm run build
         env:
-          NEXT_PUBLIC_BASE_PATH: /nexus-master-final
+          NODE_ENV: production
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
